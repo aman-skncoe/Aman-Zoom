@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<title>Cities</title>
+
+<script>
+var settings = {
+  "async": true,
+  "crossDomain": true,
+  "url": "https://api.zoomcar.com/v4/cities?platform=web",
+  "method": "GET"
+}
+
+$.ajax(settings).done(function (response) {
+
+    images=response;
+images.cities = images.cities.sort(function (each1,each2){
+    return each1.popular  && !each2.popular? -1:1;
+})
+ renderContent(images);
+
+  
+
+});
+
+function renderContent(response){
+    var images = "<h2>Popular</h2>";
+    var unpopular= true;
+  for  (i = 0; i < response.cities.length ; i++){
+    if (!response.cities[i].popular && unpopular  ){
+    unpopular=false;
+    images += "<h2>Others</h2>";
+}
+
+    
+    images+="<div class = 'container'><img src = ' " +response.cities[i].icon + " ' class = 'city-img'><div>"+response.cities[i].name +"</div></div>";
+
+  }
+  document.getElementById('city').innerHTML= images;
+}
+
+function filter(fliterType){
+
+    var filtered= images.cities;
+
+    if(fliterType == "search"){
+        var text= document.getElementById('search').value.toLowerCase();
+        filtered = filtered.filter(function(each){
+            return each.name.toLowerCase().indexOf(text) > -1;
+        })
+
+    }
+
+    if(fliterType == "hdEnable"  ){
+        hdEnable =! hdEnable;
+        
+        // else{
+        //     renderContent(images);
+        // };
+    }
+    if(fliterType == "oneWayEnable"  ){
+        oneWayEnable =! oneWayEnable;
+     
+    }
+    if(hdEnable){
+             filtered = images.cities.filter(function(each){
+
+                return each.hd_enabled ;
+            })
+            
+            
+        }
+
+        if(oneWayEnable){
+             filtered = filtered.filter(function(each){
+
+                return each.one_way_enabled ;
+            })
+            
+        }
+
+    renderContent({cities:filtered});
+};
+
+var images= {};
+var  hdEnable = false;
+var oneWayEnable = false;
+
+</script>
+<style>
+#city{
+
+    display:  flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.container{
+
+margin: 20px;
+height: 150px;
+width: 150px;
+}
+
+.city-img{
+
+    height: 100px;
+    width: 100px;
+}
+h2{
+    width: 100%;
+}
+
+#hd_Enable{
+    margin-left: 315px;
+}
+
+#one_way_Enable{
+    margin-left: 532px;
+}
+
+div{
+    text-align: center;
+}
+
+#search{
+    margin-left: 35px;
+}
+h1{
+    margin-left: 35px;
+}
+</style>
+</head>
+<body>
+<h1>Cities</h1>
+<input type="text" id = "search" placeholder="Search" onkeyup = " filter('search')">
+
+<input type="checkbox" id="hd_Enable" name="HD Enable" value="hdEnable" onclick = "filter('hdEnable')">
+<label for="hd_Enable"> HD_Enable </label><br>
+
+<input type="checkbox" id="one_way_Enable" name="one way Enable" value="oneWayEnable" onclick=" filter('oneWayEnable')">
+<label for="oneWayEnable"> One Way Enable </label><br>
+
+<div id="city"></div>
+<!-- <img src = "" id="imageBox" alt="sorry "> -->
+
+
+</body>
+</html>
+
